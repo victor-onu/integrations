@@ -1,7 +1,7 @@
-package com.victor.integrations.interswitch.controller;
+package com.victor.integrations.providers.interswitch.controller;
 
-import com.victor.integrations.interswitch.pojo.GetBillerResponse;
-import com.victor.integrations.interswitch.services.InterswitchService;
+import com.victor.integrations.providers.interswitch.pojo.GetBillerResponse;
+import com.victor.integrations.providers.interswitch.services.InterswitchService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

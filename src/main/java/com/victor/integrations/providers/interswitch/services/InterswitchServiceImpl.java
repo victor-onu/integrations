@@ -1,15 +1,18 @@
-package com.victor.integrations.interswitch.services;
+package com.victor.integrations.providers.interswitch.services;
 
 import com.victor.integrations.AbstractBillerService;
 import com.victor.integrations.exceptions.ApplicationException;
 import com.victor.integrations.exceptions.ErrorResponse;
-import com.victor.integrations.interswitch.pojo.AuthenticateRequest;
-import com.victor.integrations.interswitch.pojo.AuthenticateResponse;
-import com.victor.integrations.interswitch.pojo.GetBillerResponse;
+import com.victor.integrations.exceptions.InterswitchErrorResponse;
+import com.victor.integrations.providers.interswitch.pojo.AuthenticateRequest;
+import com.victor.integrations.providers.interswitch.pojo.AuthenticateResponse;
+import com.victor.integrations.providers.interswitch.pojo.GetBillerResponse;
 import com.victor.integrations.utils.JsonUtils;
 import io.vavr.control.Try;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,7 +29,10 @@ import java.util.Base64;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class InterswitchServiceImpl extends AbstractBillerService implements InterswitchService {
+
+    private static final Logger log = LoggerFactory.getLogger(InterswitchServiceImpl.class);
 
     @Value("${interswitch.url}")
     private String url;
@@ -42,7 +48,7 @@ public class InterswitchServiceImpl extends AbstractBillerService implements Int
 
 
 
-    public  AuthenticateResponse login(){
+    public AuthenticateResponse login(){
         String narration = "calling login end point";
 
         AuthenticateRequest authenticateRequest = new AuthenticateRequest();
@@ -50,8 +56,9 @@ public class InterswitchServiceImpl extends AbstractBillerService implements Int
 
         AuthenticateResponse authenticateResponse = Try.of(() -> callClient( url + "/passport/oauth/token", HttpMethod.POST, authenticateRequest,  getLoginRestHttpHeaders(), narration,  AuthenticateResponse.class, true))
                 .onFailure(RestClientResponseException.class, throwable -> {
-                    ErrorResponse errorResponse = JsonUtils.cast(throwable.getResponseBodyAsString(), ErrorResponse.class);
-                    throw new ApplicationException(errorResponse == null ? "An unknown error occurred." : errorResponse.getMessage());
+
+                    InterswitchErrorResponse errorResponse = JsonUtils.cast(throwable.getResponseBodyAsString(), InterswitchErrorResponse.class);
+                    throw new ApplicationException(errorResponse == null ? "An unknown error occurred." : errorResponse.getErrors().get(0).getMessage());
                 }).get().getBody();
 
         return authenticateResponse;
@@ -82,7 +89,7 @@ public class InterswitchServiceImpl extends AbstractBillerService implements Int
     public GetBillerResponse getBillers() {
         String narration = "calling get-Billers endpoint";
 
-        final Logger log = null;
+//        final Logger log = null;
 
         String getBillersUrl = url + "/api/v2/quickteller/billers";
         String httpMethod = "GET";

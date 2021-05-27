@@ -1,4 +1,4 @@
-package com.victor.integrations.interswitch.pojo;
+package com.victor.integrations.providers.interswitch.pojo;
 
 import lombok.Data;
 
