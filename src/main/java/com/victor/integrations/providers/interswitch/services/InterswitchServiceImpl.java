@@ -78,7 +78,7 @@ public class InterswitchServiceImpl extends AbstractBillerService implements Int
         httpHeaders.set("Authorization", generateAuth(clientId));
         httpHeaders.set("Nonce", nonce);
         String time = getTime();
-        httpHeaders.set("Time", time);
+        httpHeaders.set("Timestamp", time);
         httpHeaders.set("SignatureMethod", "SHA1");
         httpHeaders.set("TerminalId", terminalId);
         httpHeaders.set("Signature", generateSignature(method, url, time, nonce, clientId, secretKey, log));
