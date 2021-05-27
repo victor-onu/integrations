@@ -68,6 +68,7 @@ public class InterswitchServiceImpl extends AbstractBillerService implements Int
     protected HttpHeaders getHttpHeaders(String method, String url, final Logger log) throws UnsupportedEncodingException, URISyntaxException {
         HttpHeaders httpHeaders = super.getRestHttpHeaders();
         String nonce = generateNonce();
+        httpHeaders.set("Authorization", generateAuth(clientId));
         httpHeaders.set("Nonce", nonce);
         String time = getTime();
         httpHeaders.set("Time", time);
@@ -163,5 +164,11 @@ public class InterswitchServiceImpl extends AbstractBillerService implements Int
         String uniqueId = String.valueOf((int)(System.currentTimeMillis() & 0xFFFFFFFL)) + uniqueKey.toString().substring(1, 20);
         uniqueId = uniqueId.replaceAll("-", "");
         return uniqueId;
+    }
+
+    public String generateAuth(final String clientId) throws UnsupportedEncodingException {
+        final String userCred = "InterswitchAuth " + Base64.getEncoder().encodeToString(clientId.getBytes());
+        System.out.println("Auth string >>>> " + userCred);
+        return userCred;
     }
 }
